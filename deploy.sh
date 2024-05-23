@@ -9,9 +9,23 @@ fi
 # 定义可执行文件的安装路径
 INSTALL_PATH="/usr/local/bin/quili-webapi"
 
-# 下载quili-webapi可执行文件
+# 获取系统架构
+ARCH=$(uname -m)
+
+# 根据系统架构下载不同版本的quili-webapi可执行文件
 echo "Downloading quili-webapi..."
-curl -L https://raw.githubusercontent.com/nullcache/quili-webapi-deploy/master/quili-webapi -o $INSTALL_PATH
+if [ "$ARCH" = "x86_64" ]; then
+    # 对于x86_64架构
+    curl -L https://raw.githubusercontent.com/nullcache/quili-webapi-deploy/master/quili-webapi -o $INSTALL_PATH
+elif [ "$ARCH" = "armv7l" ] || [ "$ARCH" = "aarch64" ]; then
+    # 对于ARM架构
+    curl -L https://raw.githubusercontent.com/nullcache/quili-webapi-deploy/master/quili-webapi-arm -o $INSTALL_PATH
+    # 重命名为 quili-webapi，如果需要
+    mv $INSTALL_PATH-arm $INSTALL_PATH
+else
+    echo "Unsupported architecture: $ARCH"
+    exit 1
+fi
 
 # 确保下载的文件是可执行的
 chmod +x $INSTALL_PATH
